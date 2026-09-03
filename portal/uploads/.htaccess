@@ -1,0 +1,13 @@
+# Uploaded files are data, never code. Even though upload validation derives
+# the extension server-side, this is the backstop: nothing in this tree may
+# be executed by the PHP handler.
+php_flag engine off
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .phar
+RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8 .phar
+AddType text/plain .php .phtml .phar
+
+<FilesMatch "\.(php|phtml|phar|ph[0-9]|cgi|pl|py|sh|htaccess)$">
+  Require all denied
+</FilesMatch>
+
+Options -Indexes -ExecCGI

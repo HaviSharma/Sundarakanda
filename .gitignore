@@ -1,0 +1,17 @@
+# Local development configuration and secrets
+portal/config.local.php
+.env
+.env.*
+
+# OS and editor metadata
+.DS_Store
+**/.DS_Store
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Runtime uploads (retain committed directory/protection files)
+portal/uploads/events/*
+!portal/uploads/events/.gitkeep
+

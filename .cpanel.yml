@@ -2,7 +2,9 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/hubkchx2q0c5/public_html
-    - /bin/cp -a . $DEPLOYPATH
+    - /bin/cp -R . $DEPLOYPATH
     - /bin/rm -rf $DEPLOYPATH/.git
     - /bin/rm -f $DEPLOYPATH/.cpanel.yml
     - /bin/rm -rf $DEPLOYPATH/portal/sql
+    - /usr/bin/find $DEPLOYPATH -type d -exec chmod 755 {} \;
+    - /usr/bin/find $DEPLOYPATH -type f -exec chmod 644 {} \;

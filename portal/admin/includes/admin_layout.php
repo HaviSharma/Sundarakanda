@@ -23,6 +23,9 @@ function admin_top(string $title, string $active = ''): void
       <a href="donations.php" style="color:<?= $active === 'donations' ? 'var(--gold-300)' : '#f0e2d3' ?>">Donations</a>
       <a href="events.php" style="color:<?= $active === 'events' ? 'var(--gold-300)' : '#f0e2d3' ?>">Events</a>
       <a href="announcement.php" style="color:<?= $active === 'announcement' ? 'var(--gold-300)' : '#f0e2d3' ?>">Send Announcement</a>
+      <?php if (has_role(['admin'])): ?>
+        <a href="users.php" style="color:<?= $active === 'users' ? 'var(--gold-300)' : '#f0e2d3' ?>">Users</a>
+      <?php endif; ?>
       <a class="btn btn-outline btn-sm" href="logout.php">Sign Out</a>
     </div>
   </div>

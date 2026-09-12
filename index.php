@@ -3,22 +3,152 @@ $pageTitle = 'Home';
 $pageDesc = 'Sundarakanda USA — MS Rama Rao Memorial Foundation. Telugu Hanuman Chalisa and Sundarakanda Parayanam, community service, and devotional heritage.';
 $activeNav = 'home';
 include __DIR__ . '/inc/header.php';
+
+// The hero and Upcoming Events section below share one query: the soonest
+// upcoming event with a banner becomes the featured poster (and retires
+// itself automatically once its date passes, since get_upcoming_events()
+// only returns today-onward events).
+$upcomingEvents = get_upcoming_events(6);
+$heroEvent = null;
+foreach ($upcomingEvents as $ev) {
+    if (!empty($ev['banner_image'])) { $heroEvent = $ev; break; }
+}
 ?>
 <section class="hero">
-  <div class="decor-dots"></div>
   <div class="container">
     <div class="hero-copy">
       <p class="kicker">Sundarakanda &middot; MS Rama Rao Memorial Foundation USA</p>
-      <h1>Carrying forward the devotional legacy of Hanuman Chalisa &amp; Sundarakanda</h1>
-      <p class="lead">Founded in memory of Hanumath Upasaka Shri Sunderdas M.S. Rama Rao &mdash; who first brought the Telugu Hanuman Chalisa and Sundarakanda to life in song &mdash; Sundarakanda USA continues his path of devotion, Parayanam, and community service.</p>
+      <h1>A living tradition of devotion.</h1>
+      <p class="lead">Experience the Telugu Hanuman Chalisa and Sundarakanda through collective recitation, community gatherings, and the enduring legacy of Shri Sunderdas M.S. Rama Rao.</p>
       <div class="hero-actions">
-        <a class="btn btn-primary" href="parayanam.php"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg> <span>Explore Our Services</span></a>
-        <a class="btn btn-outline" href="portal/events.php"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> <span>Upcoming Events</span></a>
+        <a class="btn btn-primary" href="#upcoming-events"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> <span>Upcoming Events</span></a>
+        <a class="btn btn-outline" href="parayanam.php"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg> <span>Explore Our Services</span></a>
       </div>
     </div>
     <div class="hero-media">
-      <div class="frame"><img src="img/h_1.png" alt="Lord Hanuman idol adorned for worship"></div>
-      <div class="hero-badge"><span class="num">3</span><span>generations carrying forward one devotional legacy</span></div>
+      <?php if ($heroEvent): ?>
+        <p class="hero-poster-label">Featured gathering</p>
+        <button type="button" class="hero-poster-frame" data-lightbox="portal/uploads/events/<?= e($heroEvent['banner_image']) ?>" data-caption="<?= e($heroEvent['title']) ?>" aria-label="View full poster for <?= e($heroEvent['title']) ?>">
+          <img src="portal/uploads/events/<?= e($heroEvent['banner_image']) ?>" alt="<?= e($heroEvent['title']) ?> event poster">
+        </button>
+        <a class="hero-poster-link" href="#upcoming-events">View event details &rarr;</a>
+      <?php else: ?>
+        <div class="frame"><img src="img/h_1.png" alt="Lord Hanuman idol adorned for worship"></div>
+      <?php endif; ?>
+    </div>
+  </div>
+</section>
+
+<section id="upcoming-events">
+  <div class="container">
+    <div class="section-head center">
+      <p class="kicker" style="justify-content:center">Gather With Us</p>
+      <h2>Upcoming Events</h2>
+      <p>Join our community for prayer, recitation, and shared devotion.</p>
+    </div>
+
+    <?php if ($upcomingEvents): ?>
+      <?php
+      $featured = array_shift($upcomingEvents);
+      $featuredDesc = trim(strip_tags($featured['description'] ?? ''));
+      if (mb_strlen($featuredDesc) > 220) { $featuredDesc = mb_substr($featuredDesc, 0, 220) . '…'; }
+      ?>
+      <div class="featured-event">
+        <div class="featured-event-media">
+          <?php if (!empty($featured['banner_image'])): ?>
+            <button type="button" class="featured-event-poster" data-lightbox="portal/uploads/events/<?= e($featured['banner_image']) ?>" data-caption="<?= e($featured['title']) ?>" aria-label="View full poster for <?= e($featured['title']) ?>">
+              <img src="portal/uploads/events/<?= e($featured['banner_image']) ?>" alt="<?= e($featured['title']) ?> event poster">
+            </button>
+          <?php else: ?>
+            <div class="featured-event-poster featured-event-poster--placeholder" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+          <?php endif; ?>
+        </div>
+        <div class="featured-event-body">
+          <span class="pill pill-active">Featured gathering</span>
+          <h3><?= e($featured['title']) ?></h3>
+          <p class="featured-event-when">
+            <strong><?= e(format_date($featured['event_date'])) ?></strong>
+            <?php if (!empty($featured['start_time'])): ?>
+              &middot; <?= e(date('g:i A', strtotime($featured['start_time']))) ?><?= empty($featured['end_time']) ? ' Pacific' : ' – ' . e(date('g:i A', strtotime($featured['end_time']))) ?>
+            <?php endif; ?>
+            &middot; <span class="pill"><?= e(event_mode_label($featured['event_mode'])) ?></span>
+          </p>
+          <?php if (!empty($featured['address']) && in_array($featured['event_mode'], ['in_person', 'hybrid'], true)): ?>
+            <p class="featured-event-loc">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <?= e($featured['address']) ?>
+            </p>
+          <?php endif; ?>
+          <?php if ($featuredDesc !== ''): ?><p><?= e($featuredDesc) ?></p><?php endif; ?>
+
+          <div class="featured-event-actions">
+            <?php if (!empty($featured['rsvp_link'])): ?>
+              <a class="btn btn-primary btn-sm" href="<?= e($featured['rsvp_link']) ?>" target="_blank" rel="noopener">RSVP</a>
+            <?php elseif ($siteUser && user_has_rsvped((int)$featured['id'], (int)$siteUser['id'])): ?>
+              <span class="pill pill-active">You're going</span>
+            <?php elseif ($siteUser): ?>
+              <form method="post" action="portal/events.php" class="inline-form">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="rsvp">
+                <input type="hidden" name="event_id" value="<?= (int)$featured['id'] ?>">
+                <input type="text" name="website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
+                <button class="btn btn-primary btn-sm" type="submit">RSVP</button>
+              </form>
+            <?php else: ?>
+              <button class="btn btn-primary btn-sm" type="button"
+                      data-rsvp-open data-event-id="<?= (int)$featured['id'] ?>"
+                      data-event-title="<?= e($featured['title']) ?>">RSVP</button>
+            <?php endif; ?>
+
+            <a class="btn btn-ghost btn-sm" href="portal/events.php?action=download_ics&amp;event=<?= e(rawurlencode($featured['slug'])) ?>">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              Add to Calendar
+            </a>
+
+            <?php if (!empty($featured['address']) && in_array($featured['event_mode'], ['in_person', 'hybrid'], true)): ?>
+              <a class="btn btn-ghost btn-sm" href="https://www.google.com/maps/search/?api=1&amp;query=<?= e(rawurlencode($featured['address'])) ?>" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                Get Directions
+              </a>
+            <?php endif; ?>
+          </div>
+        </div>
+      </div>
+
+      <?php if ($upcomingEvents): ?>
+        <div class="events-pipeline" style="margin-top:28px">
+          <?php foreach ($upcomingEvents as $ev): $ts = strtotime($ev['event_date']); ?>
+            <div class="pipeline-item">
+              <div class="pipeline-date">
+                <span class="d"><?= e(date('j', $ts)) ?></span>
+                <span class="m"><?= e(date('M', $ts)) ?></span>
+              </div>
+              <div class="pipeline-body">
+                <h3><?= e($ev['title']) ?></h3>
+                <p>
+                  <?php if ($ev['start_time']): ?><?= e(date('g:i A', strtotime($ev['start_time']))) ?> &middot; <?php endif; ?>
+                  <?= e(event_mode_label($ev['event_mode'])) ?>
+                </p>
+              </div>
+              <a class="btn btn-ghost btn-sm" href="portal/events.php">Details</a>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
+
+      <?php if (!$siteUser): ?>
+        <?php $rsvpFormAction = 'portal/events.php'; include __DIR__ . '/portal/includes/rsvp_modal.php'; ?>
+      <?php endif; ?>
+    <?php else: ?>
+      <div class="card medium center" style="margin:0 auto;max-width:520px">
+        <p style="color:var(--ink-500)">Check our events calendar for the latest Sundarakanda Parayanam sessions and community meetings.</p>
+      </div>
+    <?php endif; ?>
+
+    <div class="text-center" style="margin-top:32px">
+      <a class="btn btn-ghost" href="portal/events.php"><span>View all events</span></a>
     </div>
   </div>
 </section>
@@ -156,32 +286,4 @@ include __DIR__ . '/inc/header.php';
   </div>
 </section>
 
-<section style="background:#fafaf9;border-top:1px solid var(--border-light);border-bottom:1px solid var(--border-light)">
-  <div class="container" style="padding:48px 0">
-    <div class="section-head center" style="margin-bottom:36px">
-      <h3 style="font-size:1rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);margin:0">Managed by</h3>
-      <p style="font-size:1.15rem;font-weight:600;margin:8px 0 0 0"><a href="https://druthion.com" target="_blank" rel="noopener" style="color:inherit">Druthion Technology Services LLC</a></p>
-    </div>
-    <div class="grid grid-3" style="gap:28px">
-      <a href="https://druthion.com" target="_blank" rel="noopener" style="text-align:center;text-decoration:none;color:inherit;transition:opacity 0.2s">
-        <img src="img/druthiai.svg" alt="Dhruti.ai" style="width:120px;height:120px;object-fit:contain;margin:0 auto 16px;display:block">
-        <h4 style="font-size:.95rem;margin:0 0 4px 0">Dhruti.ai</h4>
-        <p style="font-size:.85rem;color:var(--text-muted);margin:0">AI-powered workflow automation</p>
-      </a>
-      <a href="https://druthion.com" target="_blank" rel="noopener" style="text-align:center;text-decoration:none;color:inherit;transition:opacity 0.2s">
-        <img src="img/mfinai.svg" alt="mFin" style="width:120px;height:120px;object-fit:contain;margin:0 auto 16px;display:block">
-        <h4 style="font-size:.95rem;margin:0 0 4px 0">mFin</h4>
-        <p style="font-size:.85rem;color:var(--text-muted);margin:0">Financial management platform</p>
-      </a>
-      <a href="https://druthion.com" target="_blank" rel="noopener" style="text-align:center;text-decoration:none;color:inherit;transition:opacity 0.2s">
-        <img src="img/wfo.svg" alt="Workforce Operations" style="width:120px;height:120px;object-fit:contain;margin:0 auto 16px;display:block">
-        <h4 style="font-size:.95rem;margin:0 0 4px 0">Workforce Operations</h4>
-        <p style="font-size:.85rem;color:var(--text-muted);margin:0">Team coordination and analytics</p>
-      </a>
-    </div>
-    <p style="text-align:center;font-size:.8rem;color:var(--text-muted);margin-top:32px">
-      <strong>Note:</strong> Placeholder descriptions pending final copy from Druthion. <a href="https://druthion.com" target="_blank" rel="noopener">Visit Druthion →</a>
-    </p>
-  </div>
-</section>
 <?php include __DIR__ . '/inc/footer.php'; ?>

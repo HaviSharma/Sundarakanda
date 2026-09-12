@@ -75,6 +75,7 @@ function nav_active(string $key, string $current): string
           </ul>
         </li>
         <li<?= nav_active('events', $activeNav) ?>><a href="portal/events.php" class="nav-link">Events</a></li>
+        <li<?= nav_active('downloads', $activeNav) ?>><a href="downloads.php" class="nav-link">Downloads</a></li>
         <li<?= nav_active('contact', $activeNav) ?>><a href="contact.php" class="nav-link">Contact</a></li>
         <?php if (!$siteUser): ?>
           <li class="nav-drawer-only"><a href="portal/signup.php" class="nav-link">Become a Member</a></li>

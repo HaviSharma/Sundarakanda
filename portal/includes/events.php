@@ -293,6 +293,11 @@ function ics_fold(string $line): string
  * config.php). They are converted to UTC before being stamped with the
  * trailing "Z" — writing a local time with a Z suffix silently shifts
  * every event by the UTC offset.
+ *
+ * When end_time is unset, no DTEND is written rather than guessing a
+ * duration — per RFC 5545 §3.6.1, a VEVENT with only DTSTART is a valid
+ * point-in-time event, which is the honest representation of "we know
+ * when it starts, not when it ends."
  */
 function generate_ics_content(array $event): string
 {
@@ -301,20 +306,23 @@ function generate_ics_content(array $event): string
 
     $date = $event['event_date'];
     $start = $event['start_time'] ?: '08:00:00';
-    $end = $event['end_time'] ?: '09:00:00';
 
     $dtStart = DateTime::createFromFormat('Y-m-d H:i:s', "$date $start", $siteTz)
         ?: new DateTime("$date 08:00:00", $siteTz);
-    $dtEnd = DateTime::createFromFormat('Y-m-d H:i:s', "$date $end", $siteTz)
-        ?: new DateTime("$date 09:00:00", $siteTz);
 
-    // An end time earlier than the start means the event runs past midnight.
-    if ($dtEnd <= $dtStart) {
-        $dtEnd = (clone $dtStart)->modify('+1 hour');
+    $dtEnd = null;
+    if (!empty($event['end_time'])) {
+        $dtEnd = DateTime::createFromFormat('Y-m-d H:i:s', "$date {$event['end_time']}", $siteTz);
+        if ($dtEnd) {
+            // An end time earlier than the start means the event runs past midnight.
+            if ($dtEnd <= $dtStart) {
+                $dtEnd->modify('+1 day');
+            }
+            $dtEnd->setTimezone($utc);
+        }
     }
 
     $dtStart->setTimezone($utc);
-    $dtEnd->setTimezone($utc);
 
     $location = '';
     if (in_array($event['event_mode'], ['in_person', 'hybrid'], true) && !empty($event['address'])) {
@@ -343,7 +351,9 @@ function generate_ics_content(array $event): string
     $ics .= ics_fold('UID:' . $uid);
     $ics .= ics_fold('DTSTAMP:' . gmdate('Ymd\THis\Z'));
     $ics .= ics_fold('DTSTART:' . $dtStart->format('Ymd\THis\Z'));
-    $ics .= ics_fold('DTEND:' . $dtEnd->format('Ymd\THis\Z'));
+    if ($dtEnd) {
+        $ics .= ics_fold('DTEND:' . $dtEnd->format('Ymd\THis\Z'));
+    }
     $ics .= ics_fold('SUMMARY:' . ics_escape($event['title']));
     if ($description !== '') {
         $ics .= ics_fold('DESCRIPTION:' . ics_escape($description));

@@ -17,6 +17,7 @@
           <li><a href="index.php">Home</a></li>
           <li><a href="parayanam.php">Services</a></li>
           <li><a href="portal/events.php">Events</a></li>
+          <li><a href="downloads.php">Downloads</a></li>
           <li><a href="photogallery.php">Photo Gallery</a></li>
           <li><a href="videogallery.php">Video Gallery</a></li>
         </ul>
